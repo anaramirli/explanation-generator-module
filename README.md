@@ -73,14 +73,15 @@ curl -X 'POST' \
 Response
 ```
 {
-  "shapley_features": {
-    "C5": 0.053333333333333316,
-    "D3": 0.03555555555555556,
-    "D4": 0.031111111111111117,
-    "C7": 0.022222222222222227,
-    "A5": 0.020000000000000004,
-    "Rest": 0.1622222222222222
-  }
+   "shapley_features":
+   {
+	"A5":0.06360128205686923,
+	"C4":0.05783355715129527,
+	"C8":0.05015626154668473,
+	"C5":0.04617671917708279,
+	"C3":0.04209151016301943,
+	"Rest":0.4093395347533801
+   }
 }
 ```
 
@@ -89,7 +90,7 @@ Response
 Request body
 ```
 curl -X 'POST' \
-  'http://localhost:8000/aeas-generator' \
+  'http://localhost:8080/aeas-generator' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{ "run_data": {
