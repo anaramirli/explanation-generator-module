@@ -160,7 +160,8 @@ Response
 }
 ```
 
-## Note
+## To Do
+Integrated Gradient endpoint will be developed.
 
 ## New Release
 1. Update `__version__` in `src/main.py` with a new commit.
