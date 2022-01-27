@@ -1,4 +1,4 @@
-FROM python:3.9.5
+FROM python:3.8.12
 
 RUN apt-get update \
 && apt-get upgrade -y \

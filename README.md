@@ -1,5 +1,21 @@
 # Explanation Generator Module
 
+#### Dir description
+```
++-- src
+|   +-- core
+|   +-- test
+|   +-- trained models/lstm keras
+|   +-- main.py
++--- Dockerfile
++--- requirements.txt
+```
+    
+* *core:* core/utility functions folder
+* *test:* test unit folder
+* *trained models/lstm keras:* folder for trained models that will be used in xai generators
+* *Dockerfile:* docker container file
+
 ## Build
 ```sh
 $ docker build . -t explanation-generator
@@ -20,15 +36,20 @@ $ docker run -p 8080:8080 explanation-generator
 
 ## Use
 
-### 1. isolationtree-explanation-generator
+### 1. shap-kernel-explainer-keraslstm
 
 Request body
 ```
 curl -X 'POST' \
-  'http://localhost:8080/isolationtree-explanation-generator' \
+  'http://localhost:8080/shap-kernel-explainer-keraslstm' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d '{ "run_data": {
+  -d '{
+  "parameters": {
+    "model_path": "src/trained models/lstm keras/model",
+    "scaler_path": "src/trained models/lstm keras/scaler/minmaxscaler.gz"
+  },
+    "explain_data": {
 	"A1": [616.7353, 611.1519, 626.6752, 637.2719, 642.9557, 610.7206],
 	"A2": [665.1294, 665.1294, 665.1294, 665.1294, 664.2964, 664.2964],
 	"A3": [636.7812, 636.7812, 636.7812, 636.7812, 636.7812, 636.7812],
@@ -37,128 +58,92 @@ curl -X 'POST' \
 	"A6": [289.6083, 289.0702, 289.8628, 290.1725, 286.9941, 286.294],
 	"A7": [0.8744, 0.8744, 0.8744, 0.8744, 0.7968, 0.8902],
 	"A8": [408.0314, 408.0314, 408.0314, 408.0314, 408.0314, 408.0314],
-	"A9": [19.0921, 19.0921, 19.0921, 19.0921, 19.0921, 19.0921],
-	"B1": [635.8683, 637.0881, 636.0352, 634.4209, 632.9593, 637.18],
-	"B2": [634.0299, 635.8535, 636.883, 637.4162, 637.4162, 634.9201],
-	"B3": [691.7459, 698.7901, 703.62399, 706.7784, 708.6975, 694.8862],
-	"B4": [511.7529, 476.8244, 454.6953, 440.3727, 430.2531, 492.8985],
-	"C1": [779.6705, 779.6705, 779.6705, 779.6705, 779.6705, 779.6705],
-	"C2": [777.9381, 777.9381, 777.9381, 777.9381, 777.9381, 777.9381],
-	"C3": [758.9238, 758.4783, 758.4783, 758.4783, 758.4783, 758.9803],
-	"C4": [136.2615, 136.7904, 136.0211, 135.6675, 135.2121, 135.7022],
-	"C5": [15.87, 15.9627, 16.0212, 15.9628, 15.9291, 15.7457],
-	"C6": [274.0298, 274.8324, 273.3234, 272.7507, 271.6059, 272.5491], 
-	"C7": [-0.3762, -0.3762, -0.3053, -0.3053, -0.3053, -0.3053],
-	"C8": [109.6026, 109.6026, 109.6026, 110.3097, 109.6026, 109.6026],
-	"D1": [696.0388, 693.87, 693.87, 693.87, 693.87, 695.0573],
-	"D2": [671.8816, 671.4991, 671.4991, 671.4991, 671.4991, 671.4991],
-	"D3": [634.2017, 632.0032, 632.0032, 631.0006, 631.0006, 633.0731],
-	"D4": [468.764, 487.7069, 487.5909, 491.4545, 492.1715, 490.2036],
-	"E1": [605.5621, 605.1485, 605.1485, 604.6945, 604.6945, 605.5035],
-	"E2": [615.0891, 615.0891, 615.0891, 615.0891, 615.0891, 615.0891],
-	"E3": [590.2991, 590.2991, 590.2991, 590.2991, 590.2991, 590.2991],
-	"E4": [819.8063, 809.7016, 817.7061, 816.6172, 820.4639, 817.4162],
-	"X1": [0.8217, 0.7416, 0.5517, 0.3218, -0.0288, 0.7465],
-	"X2": [0.3313, 0.3313, 0.3313, 0.3313, 0.3313, 0.3313]}, 
-	
-	"first_n": 5, 
-	
-    "parameters": {
-        "allsteps_included": false,
-        "timestep_start": 1,
-        "timestep_end": 4}
+	"A9": [19.0921, 19.0921, 19.0921, 19.0921, 19.0921, 19.0921]},
+
+    "baseline_data": {
+	"A1": [616.7353, 611.1519],
+	"A2": [665.1294, 665.1294],
+	"A3": [636.7812, 636.7812],
+	"A4": [321.3449, 320.9327],
+	"A5": [24.9016, 24.6329],
+	"A6": [289.6083, 289.07024],
+	"A7": [0.8744, 0.8744],
+	"A8": [408.0314, 408.0314],
+	"A9": [19.0921, 19.0921]},
+
+  "allsteps_included": false,
+  "timestep_start": 1,
+  "timestep_end": 5,
+  "first_n": 2
 }'
 ```
 
 Response
 ```
 {
-   "shapley_features":
-   {
-	"A5":0.06360128205686923,
-	"C4":0.05783355715129527,
-	"C8":0.05015626154668473,
-	"C5":0.04617671917708279,
-	"C3":0.04209151016301943,
-	"Rest":0.4093395347533801
-   }
-}
-```
-
-### 2. aeas-generator
-
-Request body
-```
-curl -X 'POST' \
-  'http://localhost:8080/aeas-generator' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{ "run_data": {
-	"A1": [616.7353, 611.1519, 626.6752, 637.2719, 642.9557, 610.7206],
-	"A2": [665.1294, 665.1294, 665.1294, 665.1294, 664.2964, 664.2964],
-	"A3": [636.7812, 636.7812, 636.7812, 636.7812, 636.7812, 636.7812],
-	"A4": [321.3449, 320.9327, 321.784, 322.1602, 318.5836, 318.0116],
-	"A5": [24.9016, 24.6329, 24.7058, 25.1163, 24.6315, 24.431],
-	"A6": [289.6083, 289.0702, 289.8628, 290.1725, 286.9941, 286.294],
-	"A7": [0.8744, 0.8744, 0.8744, 0.8744, 0.7968, 0.8902],
-	"A8": [408.0314, 408.0314, 408.0314, 408.0314, 408.0314, 408.0314],
-	"A9": [19.0921, 19.0921, 19.0921, 19.0921, 19.0921, 19.0921],
-	"B1": [635.8683, 637.0881, 636.0352, 634.4209, 632.9593, 637.18],
-	"B2": [634.0299, 635.8535, 636.883, 637.4162, 637.4162, 634.9201],
-	"B3": [691.7459, 698.7901, 703.62399, 706.7784, 708.6975, 694.8862],
-	"B4": [511.7529, 476.8244, 454.6953, 440.3727, 430.2531, 492.8985],
-	"C1": [779.6705, 779.6705, 779.6705, 779.6705, 779.6705, 779.6705],
-	"C2": [777.9381, 777.9381, 777.9381, 777.9381, 777.9381, 777.9381],
-	"C3": [758.9238, 758.4783, 758.4783, 758.4783, 758.4783, 758.9803],
-	"C4": [136.2615, 136.7904, 136.0211, 135.6675, 135.2121, 135.7022],
-	"C5": [15.87, 15.9627, 16.0212, 15.9628, 15.9291, 15.7457],
-	"C6": [274.0298, 274.8324, 273.3234, 272.7507, 271.6059, 272.5491], 
-	"C7": [-0.3762, -0.3762, -0.3053, -0.3053, -0.3053, -0.3053],
-	"C8": [109.6026, 109.6026, 109.6026, 110.3097, 109.6026, 109.6026],
-	"D1": [696.0388, 693.87, 693.87, 693.87, 693.87, 695.0573],
-	"D2": [671.8816, 671.4991, 671.4991, 671.4991, 671.4991, 671.4991],
-	"D3": [634.2017, 632.0032, 632.0032, 631.0006, 631.0006, 633.0731],
-	"D4": [468.764, 487.7069, 487.5909, 491.4545, 492.1715, 490.2036],
-	"E1": [605.5621, 605.1485, 605.1485, 604.6945, 604.6945, 605.5035],
-	"E2": [615.0891, 615.0891, 615.0891, 615.0891, 615.0891, 615.0891],
-	"E3": [590.2991, 590.2991, 590.2991, 590.2991, 590.2991, 590.2991],
-	"E4": [819.8063, 809.7016, 817.7061, 816.6172, 820.4639, 817.4162],
-	"X1": [0.8217, 0.7416, 0.5517, 0.3218, -0.0288, 0.7465],
-	"X2": [0.3313, 0.3313, 0.3313, 0.3313, 0.3313, 0.3313]}, 
-	
-	"num_anomalies_to_explain": 1, 
-	
-    "parameters": {
-        "allsteps_included": false,
-        "timestep_start": 1,
-        "timestep_end": 4}
-}'
-```
-
-Response
-```
-{
-  "timeseries_anomaly_features": {
-    "1": [
-      ["C7", 0.010373665747700564],
-      ["E4", 0.006709346377488344],
-      ["A1",0.006652534677852057],
-      ["C6",0.002724539310819373],
-      ["C4", 0.0026822643054557347],
-      ["B2",0.001827991356478799],
-      ["D1",0.0018144925011582117],
-      ["C5",0.0017605594797516985],
-      ["B1",0.0016457709914967063],
-      ["A2",0.018202290039275516],
-      ["C8",0.011963846012465171],
-      ["X1",0.011328377632369546],
-      ["C3",0.010913324700011905],
-      ["D2", 0.009005796532144117],
-      ["D3",0.008195828315337071]
-    ]
+  "attributing_features": {
+    "A1": 0.9302,
+    "A5": 0.0011
+  },
+  "offseting_features": {
+    "A2": -0.162,
+    "A7": -0.0158
   }
 }
 ```
+
+## Request bodies (Schemas)
+Here the structure of each request body used in main.py has been explained.
+
+### 1. Parameters
+
+```Python
+class Parameters(BaseModel):
+    '''Parameters for explanation generation'''
+    model_path: str
+    scaler_path: str    
+```
+This is the main request body for accessing the pre-trained networks
+
+* **model_path**: path to the saved trained model (to the directory where a Keras model is saved using joblib)
+* **scaler_path**: path to the scaler values (path of the joblib dumped file (.gz)), will be used to scale the new data.
+
+### 2. FeatureExplanationInput
+
+```Python
+class FeatureExplanationInput(BaseModel):
+    '''Data provided for explanation generation'''
+    
+    parameters: Parameters
+    explain_data: Dict[str, List[float]]
+    baseline_data: Dict[str, List[float]]
+    allsteps_included: bool = False
+    timestep_start: int
+    timestep_end: int
+    first_n: int = 5
+```
+
+This is the request body is used for an explanation of the general feature importance using kernel shap method on a keras lstm model. In the code examples, this request body has been used with /shap-kernel-explainer-keraslstm.
+
+* **parameters**: are a class type of the main request of Parameters.
+* **explain_dat**: is the structure of data accepted with an HTTP request. It can hold any time-series data, with the 2-D domain. It stands for the data we want to explain.
+* **baseline_data**: is the structure of data accepted with an HTTP request. It can hold any time-series data, with the 2-D domain. This is a small subset, preferably from a training set, used as baseline value for explanation model.
+* **allstep_included**: default value being False means only timesteps between timestep_start and timestep_end will be explained. If True, than all timesteps of the given data will be explained.
+* **timestep_start**: timestep_end used to select the desired timestep range if allstep_includes has been set False.
+* **first_n**: account for the number of n most strong features we want to explain.
+
+### 3. FeatureExplanationInputOutput
+
+```Python
+class FeatureExplanationOutput(BaseModel):
+    '''Shapley values of features'''
+    attributing_features: Dict[str, float]
+    offseting_features: Dict[str, float]
+```
+This is a response body which will be used for most of the xai APIs.
+
+* **attributing_features**: list of top *first_n* features that contribute to the reconstruction loss, "str" stand for the feature name, "float" depicts the corresponding attribution values.
+* **offseting_features**: list of top *first_n* features that reduce the reconstruction loss, "str" stands for the feature name, "float" depicts the corresponding attribution values.
 
 ## To Do
 Integrated Gradient endpoint will be developed.
