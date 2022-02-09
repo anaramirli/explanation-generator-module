@@ -26,7 +26,7 @@ $ docker build . -t explanation-generator
 With docker
 
 ```sh
-$ docker run -p 8080:8080 explanation-generator
+$ docker run -p 8080:8080 -v keras-lstm explanation-generator
 ```
 
 
