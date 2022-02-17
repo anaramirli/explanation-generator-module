@@ -12,6 +12,7 @@ import joblib
 import keras 
 import numpy as np
 import pandas as pd
+import os
 
 
 app = FastAPI(
@@ -56,9 +57,12 @@ class FeatureExplanationOutput(BaseModel):
 async def extract_important_features(mvts_data: FeatureExplanationInput):
 
     # get model
-    model = keras.models.load_model(mvts_data.paths.model)
+    path_to_model = os.path.join('data',mvts_data.paths.model)
+    model = keras.models.load_model(path_to_model)
+
     # get scaler
-    scaler = joblib.load(mvts_data.paths.scaler)
+    path_to_scaler = os.path.join('data',mvts_data.paths.scaler)
+    scaler = joblib.load(path_to_scaler)
     
     
     # load and preprocess inputX and baselineX
