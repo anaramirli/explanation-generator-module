@@ -46,8 +46,8 @@ curl -X 'POST' \
   -H 'Content-Type: application/json' \
   -d '{
   "paths": {
-	"model": "src/trained models/lstm keras/model",
-	"scaler": "src/trained models/lstm keras/scaler/minmaxscaler.gz"
+	"model": "keras_mvts_lstm.h5",
+    	"scaler": "mvts_scaler.gz"
   },
   "explain_data": {
 	"data": {
