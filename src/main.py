@@ -1,6 +1,6 @@
 """Explanation Generator module."""
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 from multiprocessing.dummy import shutdown
 import shutil
@@ -54,7 +54,7 @@ class FeatureExplanationOutput(BaseModel):
     offseting_features: Dict[str, float]
 
 
-@app.post('/shap-kernel-explainer-keraslstm', response_model=FeatureExplanationOutput)
+@app.post('/keras-shap-kernel-explainer', response_model=FeatureExplanationOutput)
 async def extract_important_features(mvts_data: FeatureExplanationInput):
 
     # get model
@@ -127,20 +127,8 @@ async def extract_important_features(mvts_data: FeatureExplanationInput):
 @app.post("/upload-model/")
 async def upload_model(file: UploadFile = File(...)):
     file_location = os.path.join('data', file.filename)
-    print(file_location)
     with open(file_location, "wb+") as file_object:
         file_object.write(file.file.read())
-
-    extract_dir = file_location[:-4]
-
-    if file_location[-4:] == '.zip':
-
-        # if os.path.exists(extract_dir):
-        #     shutil.rmtree(extract_dir)
-        # os.makedirs(extract_dir)
-
-        shutil.unpack_archive(file_location, extract_dir, format='zip')
-        os.remove(file_location)
 
     return {"filename": file.filename}
 
