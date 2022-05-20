@@ -11,3 +11,4 @@ pydantic==1.9.0
 shap==0.40.0
 pytest==7.1.2
 python-multipart==0.0.5
+wget==3.2

@@ -2,11 +2,11 @@
 
 __version__ = '2.0.1'
 
-from multiprocessing.dummy import shutdown
 import shutil
 from typing import Dict, List
 from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 
 import shap
 import joblib
@@ -123,6 +123,9 @@ async def extract_important_features(mvts_data: FeatureExplanationInput):
     return FeatureExplanationOutput(attributing_features=attributing_top,
                                     offseting_features=offseting_top)
 
+
+# serve static files
+app.mount("/data", StaticFiles(directory="data/", html=True), name="model data")
 
 @app.post("/upload-model/")
 async def upload_model(file: UploadFile = File(...)):
