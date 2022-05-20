@@ -26,13 +26,13 @@ $ docker build . -t explanation-generator
 With docker
 
 ```sh
-$ docker run -p 8080:8080 -v keras-lstm:/app/data:ro explanation-generator
+$ docker run -p 8082:8080 explanation-generator
 ```
 
 
 ## Documentation
-* Swagger: http://localhost:8080/documentation
-* ReDoc: http://localhost:8080/redoc
+* Swagger: http://localhost:8082/documentation
+* ReDoc: http://localhost:8082/redoc
 
 ## Use
 
@@ -41,7 +41,7 @@ $ docker run -p 8080:8080 -v keras-lstm:/app/data:ro explanation-generator
 Request body
 ```
 curl -X 'POST' \
-  'http://localhost:8080/shap-kernel-explainer-keraslstm' \
+  'http://localhost:8082/keras-shap-kernel-explainer' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
