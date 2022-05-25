@@ -2,22 +2,13 @@
 
 ## Build
 
-To be able to run the unit test, first make sure that docker container is started.
+To be able to run the unit test, first make sure that docker container is running.
 
-1. create python evironment and activate it
-```sh
-$ conda create -n test_env python=3.8.12
-$ conda activate test_env
-```
-
-2. install the packages
-```sh
-$ pip install -r requirements.txt
-```
-
-## Run
-
-3. Run the unit test
-```sh
-$ pytest
-```
+1. To install the relevant dependencies (with python 3.9):
+    ```
+    pip install -r requirements.txt
+    ```   
+2. Run the following command from the repository.
+   ```
+   pytest
+   ```

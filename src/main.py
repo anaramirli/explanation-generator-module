@@ -1,6 +1,6 @@
 """Explanation Generator module."""
 
-__version__ = '2.0.1'
+__version__ = '2.0.0'
 
 import shutil
 from typing import Dict, List

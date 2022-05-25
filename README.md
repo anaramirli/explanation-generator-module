@@ -26,13 +26,21 @@ $ docker build . -t explanation-generator
 With docker
 
 ```sh
-$ docker run -p 8082:8080 explanation-generator
+$ docker run -p 8080:8080 explanation-generator
+```
+
+## Unit Tests
+Note: Make sure that test requirements are met (see src/tests/requirements.txt)
+```sh
+$ cd src/tests
+$ pytest
 ```
 
 
+
 ## Documentation
-* Swagger: http://localhost:8082/documentation
-* ReDoc: http://localhost:8082/redoc
+* Swagger: http://localhost:8080/documentation
+* ReDoc: http://localhost:8080/redoc
 
 ## Use
 
@@ -41,7 +49,7 @@ $ docker run -p 8082:8080 explanation-generator
 Request body
 ```
 curl -X 'POST' \
-  'http://localhost:8082/keras-shap-kernel-explainer' \
+  'http://localhost:8080/keras-shap-kernel-explainer' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{

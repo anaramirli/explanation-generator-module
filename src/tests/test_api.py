@@ -1,22 +1,66 @@
 """Test the webserver built with FastAPI"""
 
-import sys
 from fastapi.testclient import TestClient
-
-# sys.path.append("..")
 from ..main import app
+import os
+import json
+
 
 client = TestClient(app)
+
+# constants
+model_name = 'keras_mvts_lstm.h5'
+scaler_name = 'mvts_scaler.gz'
+
+
+# upload files from mvts training (model)
+def test_upload_model_files():
+
+
+    # # download files (to the local machine) from Multivariate Aggregator container
+    # wget.download(MVTS_URL+'/data/'+model_name)
+    # wget.download(MVTS_URL+'/data/'+scaler_name)
+
+    # paths to test data
+    twd = os.path.dirname(__file__)
+
+    model_path = os.path.join(
+        twd,
+        os.path.join('data', model_name))
+        
+
+    scaler_path = os.path.join(
+        twd,
+        os.path.join('data', scaler_name))
+    
+    # open/load the files
+    model = open(model_path, 'rb')
+    scaler = open(scaler_path, 'rb')
+
+
+    model_response = client.post(
+        "/upload-model/", files={"file": (model_name, model)}
+    )
+
+    scaler_response = client.post(
+         "/upload-model/", files={"file": (scaler_name, scaler)} 
+    )
+    # delete files (from the local machine) after uploading
+    model.close()
+    scaler.close()
+
+    assert model_response.status_code==200, "Upload-Model Fail Reason: {}\n".format(model_response.reason)
+    assert scaler_response.status_code==200, "Upload-Scaler Fail Reason: {}\n".format(scaler_response.reason)
 
 
 def test_isolationtree_explanation_generator():
     """Tests for of explaining feature importance."""
     response = client.post(
-        '/shap-kernel-explainer-keraslstm',
+        '/keras-shap-kernel-explainer',
         json= {
           "paths": {
-            "model": "../trained models/lstm keras/model",
-            "scaler": "../trained models/lstm keras/scaler/minmaxscaler.gz"
+            "model": model_name,
+            "scaler": scaler_name
           },
           "explain_data": {
             "data": {
@@ -24,11 +68,7 @@ def test_isolationtree_explanation_generator():
                 "A2": [665.1294, 665.1294, 665.1294, 665.1294, 664.2964, 664.2964],
                 "A3": [636.7812, 636.7812, 636.7812, 636.7812, 636.7812, 636.7812],
                 "A4": [321.3449, 320.9327, 321.784, 322.1602, 318.5836, 318.0116],
-                "A5": [24.9016, 24.6329, 24.7058, 25.1163, 24.6315, 24.431],
-                "A6": [289.6083, 289.0702, 289.8628, 290.1725, 286.9941, 286.294],
-                "A7": [0.8744, 0.8744, 0.8744, 0.8744, 0.7968, 0.8902],
-                "A8": [408.0314, 408.0314, 408.0314, 408.0314, 408.0314, 408.0314],
-                "A9": [19.0921, 19.0921, 19.0921, 19.0921, 19.0921, 19.0921]
+                "A5": [24.9016, 24.6329, 24.7058, 25.1163, 24.6315, 24.431]
                 }
           },
           "baseline_data": {
@@ -37,11 +77,7 @@ def test_isolationtree_explanation_generator():
                 "A2": [665.1294, 665.1294],
                 "A3": [636.7812, 636.7812],
                 "A4": [321.3449, 320.9327],
-                "A5": [24.9016, 24.6329],
-                "A6": [289.6083, 289.07024],
-                "A7": [0.8744, 0.8744],
-                "A8": [408.0314, 408.0314],
-                "A9": [19.0921, 19.0921]
+                "A5": [24.9016, 24.6329]
                 }
           },
           "allsteps_included": False,
@@ -52,13 +88,22 @@ def test_isolationtree_explanation_generator():
     )
 
     assert response.status_code == 200
-    assert response.json() == {
-              "attributing_features": {
-                "A1": 0.9302,
-                "A5": 0.0011
-              },
-              "offseting_features": {
-                "A2": -0.1620,
-                "A7": -0.0158
-              }
-            }
+
+    try:
+        reponse = json.loads(response.text)
+        reponse['attributing_features']
+        reponse['offseting_features']
+    except:
+        assert False, "Key Error in the response data"
+
+
+# returns list of files in data/. 
+def test_list_files():
+
+    response = client.get('/list-model-files')
+    assert response.status_code==200, "Response Fail Reason: {}\n".format(response.reason)
+
+    try:
+        json.loads(response.text)['files']
+    except:
+        assert False, "Key Error in the response data"
