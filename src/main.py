@@ -157,3 +157,4 @@ async def remove_model_files(list_file_system_entries: List):
             shutil.rmtree(path_to_file_system_entry, ignore_errors=True)
 
     return 'ok'
+    

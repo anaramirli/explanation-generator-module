@@ -11,4 +11,4 @@ pydantic==1.9.1
 matplotlib==3.5.2
 shap==0.41.0
 python-multipart==0.0.5
-wget==3.2
+pytest==7.1.2
