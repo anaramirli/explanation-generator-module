@@ -26,8 +26,20 @@ $ docker build . -t explanation-generator
 With docker
 
 ```sh
-$ docker run -p 8080:8080 -v keras-lstm:/app/data:ro explanation-generator
+$ docker run -p 8080:8080 explanation-generator
 ```
+
+## Unit Tests
+Run with python 3.9.12+(>=12)
+```sh
+$ python3.9 -m venv .
+$ source bin/activate
+$ python -m pip install --upgrade pip
+$ python -m pip install -r requirements.txt
+$ cd src/tests
+$ pytest test_api.py
+```
+
 
 
 ## Documentation
@@ -41,13 +53,13 @@ $ docker run -p 8080:8080 -v keras-lstm:/app/data:ro explanation-generator
 Request body
 ```
 curl -X 'POST' \
-  'http://localhost:8080/shap-kernel-explainer-keraslstm' \
+  'http://localhost:8080/keras-shap-kernel-explainer' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
   "paths": {
-	"model": "src/trained models/lstm keras/model",
-	"scaler": "src/trained models/lstm keras/scaler/minmaxscaler.gz"
+	"model": "keras_mvts_lstm.h5",
+    	"scaler": "mvts_scaler.gz"
   },
   "explain_data": {
 	"data": {

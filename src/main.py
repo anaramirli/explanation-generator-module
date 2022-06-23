@@ -2,11 +2,11 @@
 
 __version__ = '2.0.0'
 
-from multiprocessing.dummy import shutdown
 import shutil
 from typing import Dict, List
 from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 
 import shap
 import joblib
@@ -54,7 +54,7 @@ class FeatureExplanationOutput(BaseModel):
     offseting_features: Dict[str, float]
 
 
-@app.post('/shap-kernel-explainer-keraslstm', response_model=FeatureExplanationOutput)
+@app.post('/keras-shap-kernel-explainer', response_model=FeatureExplanationOutput)
 async def extract_important_features(mvts_data: FeatureExplanationInput):
 
     # get model
@@ -124,23 +124,14 @@ async def extract_important_features(mvts_data: FeatureExplanationInput):
                                     offseting_features=offseting_top)
 
 
+# serve static files
+app.mount("/data", StaticFiles(directory="data/", html=True), name="model data")
+
 @app.post("/upload-model/")
 async def upload_model(file: UploadFile = File(...)):
     file_location = os.path.join('data', file.filename)
-    print(file_location)
     with open(file_location, "wb+") as file_object:
         file_object.write(file.file.read())
-
-    extract_dir = file_location[:-4]
-
-    if file_location[-4:] == '.zip':
-
-        # if os.path.exists(extract_dir):
-        #     shutil.rmtree(extract_dir)
-        # os.makedirs(extract_dir)
-
-        shutil.unpack_archive(file_location, extract_dir, format='zip')
-        os.remove(file_location)
 
     return {"filename": file.filename}
 
@@ -166,3 +157,4 @@ async def remove_model_files(list_file_system_entries: List):
             shutil.rmtree(path_to_file_system_entry, ignore_errors=True)
 
     return 'ok'
+    
